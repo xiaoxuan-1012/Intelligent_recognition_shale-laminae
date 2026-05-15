@@ -19,9 +19,9 @@ from pytorch_grad_cam.activations_and_gradients import ActivationsAndGradients
 RED, GREEN, BLUE, YELLOW, ORANGE, CYAN, MAGENTA, BOLD, RESET = "\033[91m", "\033[92m", "\033[94m", "\033[93m", "\033[38;5;208m", "\033[96m", "\033[95m", "\033[1m", "\033[0m"
 
 def patch_pose_classes_for_gradcam():
-    """修复 Pose 和 Pose26 类使其兼容 Grad-CAM，移除 inplace 操作"""
+    """Fix the Pose and Pose26 classes to make them compatible with Grad-CAM, and remove the inplace operation"""
     
-    # 修复 Pose 类
+    # Fix the Pose class
     def pose_kpts_decode_no_inplace(self, kpts: torch.Tensor) -> torch.Tensor:
         """Decode keypoints from predictions (no inplace operations)."""
         ndim = self.kpt_shape[1]
@@ -35,13 +35,13 @@ def patch_pose_classes_for_gradcam():
         else:
             y = kpts.clone()
             if ndim == 3:
-                # 强制使用非 inplace 操作
+                #Enforce the use of non-inplace operations
                 y[:, 2::ndim] = y[:, 2::ndim].sigmoid()
             y[:, 0::ndim] = (y[:, 0::ndim] * 2.0 + (self.anchors[0] - 0.5)) * self.strides
             y[:, 1::ndim] = (y[:, 1::ndim] * 2.0 + (self.anchors[1] - 0.5)) * self.strides
             return y
     
-    # 修复 Pose26 类
+    # Fix the Pose26 class
     def pose26_kpts_decode_no_inplace(self, kpts: torch.Tensor) -> torch.Tensor:
         """Decode keypoints from predictions (no inplace operations)."""
         ndim = self.kpt_shape[1]
@@ -56,13 +56,13 @@ def patch_pose_classes_for_gradcam():
         else:
             y = kpts.clone()
             if ndim == 3:
-                # 强制使用非 inplace 操作
+                # Enforce the use of non-inplace operations
                 y[:, 2::ndim] = y[:, 2::ndim].sigmoid()
             y[:, 0::ndim] = (y[:, 0::ndim] + self.anchors[0]) * self.strides
             y[:, 1::ndim] = (y[:, 1::ndim] + self.anchors[1]) * self.strides
             return y
     
-    # 应用补丁
+    # Apply the patch
     Pose.kpts_decode = pose_kpts_decode_no_inplace
     Pose26.kpts_decode = pose26_kpts_decode_no_inplace
 
@@ -353,8 +353,8 @@ class yolo_heatmap:
 
     def draw_detections(self, box, color, name, img):
         xmin, ymin, xmax, ymax = list(map(int, list(box)))
-        cv2.rectangle(img, (xmin, ymin), (xmax, ymax), tuple(int(x) for x in color), 2) # 绘制检测框
-        cv2.putText(img, str(name), (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, tuple(int(x) for x in color), 2, lineType=cv2.LINE_AA)  # 绘制类别、置信度
+        cv2.rectangle(img, (xmin, ymin), (xmax, ymax), tuple(int(x) for x in color), 2) # Draw the detection box
+        cv2.putText(img, str(name), (xmin, ymin - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, tuple(int(x) for x in color), 2, lineType=cv2.LINE_AA)  # Classification type, confidence level
         return img
 
     def renormalize_cam_in_bounding_boxes(self, boxes, image_float_np, grayscale_cam):
@@ -399,13 +399,13 @@ class yolo_heatmap:
             cam_image = self.renormalize_cam_in_bounding_boxes(pred.boxes.xyxy.cpu().detach().numpy().astype(np.int32), img, grayscale_cam)
         if self.show_result:
             cam_image = pred.plot(img=cam_image,
-                                  conf=True, # 显示置信度
-                                  font_size=None, # 字体大小，None为根据当前image尺寸计算
-                                  line_width=None, # 线条宽度，None为根据当前image尺寸计算
-                                  labels=False, # 显示标签
+                                  conf=True, 
+                                  font_size=None, 
+                                  line_width=None, 
+                                  labels=False, 
                                   )
         
-        # 去掉padding边界
+        # Remove the padding border
         cam_image = cam_image[top:cam_image.shape[0] - bottom, left:cam_image.shape[1] - right]
         cam_image = Image.fromarray(cam_image)
         cam_image.save(save_path)
@@ -434,18 +434,18 @@ class yolo_heatmap:
         
 def get_params():
     params = {
-        'weight': 'yolo run/train-y12n-200/weights/best.pt', # 现在只需要指定权重即可,不需要指定cfg
+        'weight': 'yolo run/train-y12n-200/weights/best.pt', 
         'device': 'cpu',
         'method': 'GradCAMPlusPlus', # GradCAMPlusPlus, GradCAM, XGradCAM, EigenCAM, HiResCAM, LayerCAM, RandomCAM, EigenGradCAM, KPCA_CAM
         'layer': [15,18, 21],
         'backward_type': 'all', # detect:<class, box, all> segment:<class, box, segment, all> pose:<box, keypoint, all> obb:<box, angle, all> classify:<all>
         'conf_threshold': 0.2, # 0.2
         'ratio': 0.02, # 0.02-0.1
-        'show_result': False, # 不需要绘制结果请设置为False
-        'renormalize': True, # 需要把热力图限制在框内请设置为True(仅对detect,segment,pose有效)
-        'task':'detect', # 任务(detect,segment,pose,obb,classify)
-        'img_size':640, # 图像尺寸
-        'letterbox_auto': False # 如果需要固定成宽高一样就设置为False，部分改进可能需要输入的宽高一致，不然会报错
+        'show_result': False, 
+        'renormalize': True, 
+        'task':'detect', 
+        'img_size':640, 
+        'letterbox_auto': False 
     }
     return params
 
