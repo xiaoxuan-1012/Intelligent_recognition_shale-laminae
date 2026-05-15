@@ -3,7 +3,7 @@ import os
 import shutil
 import random
 
-# Divide the proportions as follows: training , validation , and test .
+# Divide the proportions as follows: training , validation , and test . 
 split_rate = [0.8, 0.1, 0.1]
 split_names = ["train", "valid", "test"]
 
