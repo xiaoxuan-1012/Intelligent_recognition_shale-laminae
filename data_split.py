@@ -1,15 +1,15 @@
-# 划分数据集，原始数据集放入dataset_org中，处理后的数据会生成在dataset中
+# Split the dataset
 import os
 import shutil
 import random
 
-# 划分比例，分别是训练集、验证集合测试集，根据自己需要改一下
-split_rate = [0.7, 0.2, 0.1]
+# Divide the proportions as follows: training , validation , and test .
+split_rate = [0.8, 0.1, 0.1]
 split_names = ["train", "valid", "test"]
 
 split_rate[1] = sum(split_rate[:2])
 
-# 是否打乱
+# disrupt
 shuffle = True
 
 def replace_expand_name(file_name, ex_name):
