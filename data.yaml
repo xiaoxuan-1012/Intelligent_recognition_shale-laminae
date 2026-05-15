@@ -1,0 +1,5 @@
+train: C:\Users\86182\Desktop\ultralytics-main\dataset\train\images
+val: C:\Users\86182\Desktop\ultralytics-main\dataset\valid\images
+test: C:\Users\86182\Desktop\ultralytics-main\dataset\test\images
+nc: 3
+name: ["dark","bright","ostracum"]
